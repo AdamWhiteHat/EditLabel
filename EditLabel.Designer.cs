@@ -67,8 +67,8 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.Controls.Add(this.ctrlLabel);
 			this.Controls.Add(this.ctrlTextBox);
+			this.Controls.Add(this.ctrlLabel);
 			this.Margin = new System.Windows.Forms.Padding(0);
 			this.MinimumSize = new System.Drawing.Size(0, 13);
 			this.Name = "EditLabel";

@@ -95,15 +95,6 @@ namespace EditLabelControl
 			}
 		}
 
-
-		//public new event EventHandler TextChanged
-		//{
-		//	add { _onTextChanged += value; }
-		//	remove { _onTextChanged -= value; }
-		//}
-
-		//private EventHandler _onTextChanged;
-
 		#endregion
 
 		#region Internal Event Handlers
@@ -116,10 +107,6 @@ namespace EditLabelControl
 
 			// Fire TextChanged event
 			OnChangedText(EventArgs.Empty);
-			//if (_onTextChanged != null)
-			//{
-			//    _onTextChanged.Invoke(this, new EventArgs());
-			//}
 		}
 
         void EditResizeTextbox()
