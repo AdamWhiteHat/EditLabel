@@ -36,44 +36,48 @@ namespace EditLabelControl
 			set { ctrlLabel.TextAlign = value; }
 		}
 		
-
 		// Protected Properties
 		protected bool IsEditing { get; set; }
-        protected string _save { get; set; }
+        protected string save { get; set; }
+
+		// Private
+		private Form owner;
 
         #endregion
 
         #region Constructors and Initializer
 
-        public EditLabel() : this("editLabel")
+		public EditLabel()
+			: this(null, "editLabel")
+		{
+		}
+
+        public EditLabel(Form Owner) : this(Owner, "editLabel")
         {
-			
-            this.Text = this.Name;
         }
-        public EditLabel(string Text)
+
+        public EditLabel(Form Owner, string Text)
         {
             InitializeComponent();
             this.Text = Text;	
 			this.AutoValidate = AutoValidate.EnableAllowFocusChange;
 			base.BorderStyle = BorderStyle.None;
             Initalize_EditAction();
+			this.owner = Owner;
+			owner.Click += EndEditing;
         }
 
         void Initalize_EditAction()	// TextBox edit events
         {
-            // Begin editing
-            ctrlLabel.DoubleClick += EditLabel_OnDoubleClick;
+            ctrlLabel.DoubleClick += BeginEditing;
 
-            // End editing events
-            ctrlTextBox.KeyDown += EditLabel_OnKeyPress;
-            ctrlTextBox.LostFocus += EditLabel_EndEditing;
-            ctrlTextBox.Leave += EditLabel_EndEditing;
-
-            this.Invalidated += EditLabel_EndEditing;
-            this.Leave += EditLabel_EndEditing;
+            ctrlTextBox.LostFocus += EndEditing;
+            ctrlTextBox.Leave += EndEditing;
 
             ctrlTextBox.Click += delegate (object s, EventArgs e) { ((TextBox)s).Focus(); };
             ctrlLabel.Click += delegate (object s, EventArgs e) { ((Label)s).Focus(); };
+
+			ctrlTextBox.KeyDown += _OnKeyPress;
         }
 
 		#endregion
@@ -95,15 +99,6 @@ namespace EditLabelControl
 			}
 		}
 
-
-		//public new event EventHandler TextChanged
-		//{
-		//	add { _onTextChanged += value; }
-		//	remove { _onTextChanged -= value; }
-		//}
-
-		//private EventHandler _onTextChanged;
-
 		#endregion
 
 		#region Internal Event Handlers
@@ -116,10 +111,6 @@ namespace EditLabelControl
 
 			// Fire TextChanged event
 			OnChangedText(EventArgs.Empty);
-			//if (_onTextChanged != null)
-			//{
-			//    _onTextChanged.Invoke(this, new EventArgs());
-			//}
 		}
 
         void EditResizeTextbox()
@@ -143,7 +134,7 @@ namespace EditLabelControl
 			}
 		}
 
-		void EditLabel_OnDoubleClick(object sender, EventArgs e)
+		void BeginEditing(object sender, EventArgs e)
         {
             EditBegin();
         }
@@ -161,7 +152,7 @@ namespace EditLabelControl
             {
                 EditToggle();
 
-                _save = ctrlLabel.Text;
+                save = ctrlLabel.Text;
                 ctrlTextBox.Text = ctrlLabel.Text;
 
                 EditResizeTextbox();
@@ -178,16 +169,16 @@ namespace EditLabelControl
                 if (AcceptChanges)
                     ChangeText(ctrlTextBox.Text);
                 else
-                    ChangeText(_save);
+                    ChangeText(save);
             }
         }
 
-        void EditLabel_EndEditing(object sender, EventArgs e)
+        public void EndEditing(object sender, EventArgs e)
         {
             EditEnd();
         }
 
-        void EditLabel_OnKeyPress(object sender, KeyEventArgs e)
+        void _OnKeyPress(object sender, KeyEventArgs e)
         {
             if (IsEditing)
             {

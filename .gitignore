@@ -42,6 +42,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 *.pdb
-obj/Debug/DesignTimeResolveAssemblyReferences.cache
 *.cache
 *.resources
+obj/*
+bin/Debug/*
+*.suo
