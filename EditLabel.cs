@@ -16,6 +16,17 @@ namespace EditLabelControl
         #region Properties
         // Public Properties
 
+		[Category("Behavior")]
+		[Description("Determines whether the control is allowed to be edited.")]
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		public bool IsEditable
+		{
+			get { return _isEditable; }
+			set { if (value == false && IsEditing) { EditEnd(); } _isEditable = value; }
+		}
+		private bool _isEditable = true;
+
         [Category("Appearance")]
         [Description("The text associated with the control.")]
         [Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
@@ -37,8 +48,16 @@ namespace EditLabelControl
 		}
 		
 		// Protected Properties
-		protected bool IsEditing { get; set; }
-        protected string save { get; set; }
+		protected string save { get; set; }
+
+		protected bool IsEditing
+		{
+			get { return _isEditing; }
+			set { lock (_lockIsEditing) { _isEditing = value; } }
+		}
+		private volatile bool _isEditing = false;
+		private object _lockIsEditing = new object();
+        
 
 		// Private
 		private Form owner;
@@ -50,6 +69,8 @@ namespace EditLabelControl
 		public EditLabel()
 			: this(null, "editLabel")
 		{
+			base.BorderStyle = BorderStyle.None;
+			this.IsEditable = true;
 		}
 
         public EditLabel(Form Owner) : this(Owner, "editLabel")
@@ -62,6 +83,7 @@ namespace EditLabelControl
             this.Text = Text;	
 			this.AutoValidate = AutoValidate.EnableAllowFocusChange;
 			base.BorderStyle = BorderStyle.None;
+			this.IsEditable = true;
             Initalize_EditAction();
 			this.owner = Owner;
 			owner.Click += EndEditing;
@@ -77,7 +99,7 @@ namespace EditLabelControl
             ctrlTextBox.Click += delegate (object s, EventArgs e) { ((TextBox)s).Focus(); };
             ctrlLabel.Click += delegate (object s, EventArgs e) { ((Label)s).Focus(); };
 
-			ctrlTextBox.KeyDown += _OnKeyPress;
+			ctrlTextBox.KeyDown += OnKeyPress;
         }
 
 		#endregion
@@ -135,8 +157,8 @@ namespace EditLabelControl
 		}
 
 		void BeginEditing(object sender, EventArgs e)
-        {
-            EditBegin();
+        {			
+			EditBegin();			         
         }
 
         void EditToggle()
@@ -148,16 +170,19 @@ namespace EditLabelControl
 
         void EditBegin()
         {
-            if (!IsEditing)
-            {
-                EditToggle();
+			if (IsEditable)
+			{
+				if (!IsEditing)
+				{
+					EditToggle();
 
-                save = ctrlLabel.Text;
-                ctrlTextBox.Text = ctrlLabel.Text;
+					save = ctrlLabel.Text;
+					ctrlTextBox.Text = ctrlLabel.Text;
 
-                EditResizeTextbox();
-                ctrlTextBox.Focus();
-            }
+					EditResizeTextbox();
+					ctrlTextBox.Focus();
+				}
+			}
         }
 
         void EditEnd(bool AcceptChanges = true)
@@ -178,7 +203,7 @@ namespace EditLabelControl
             EditEnd();
         }
 
-        void _OnKeyPress(object sender, KeyEventArgs e)
+        void OnKeyPress(object sender, KeyEventArgs e)
         {
             if (IsEditing)
             {
