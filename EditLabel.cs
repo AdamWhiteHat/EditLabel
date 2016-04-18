@@ -125,20 +125,36 @@ namespace EditLabelControl
 
 		#region Internal Event Handlers
 
-		void ChangeText(string Text)
-        {
-            ctrlLabel.Text = Text;
-			base.Text = Text;
-            EditResizeTextbox();
-
-			// Fire TextChanged event
-			OnChangedText(EventArgs.Empty);
+		void BeginEditing(object sender, EventArgs e)
+		{
+			EditBegin();
 		}
 
-        void EditResizeTextbox()
-        {
-            ctrlTextBox.Size = ctrlLabel.Size;
-        }
+		public void EndEditing(object sender, EventArgs e)
+		{
+			EditEnd();
+		}
+
+		void OnKeyPress(object sender, KeyEventArgs e)
+		{
+			if (IsEditing)
+			{
+				switch (e.KeyData)
+				{
+					case Keys.Escape:
+						EditEnd(false);
+						break;
+
+					case Keys.Return:
+						EditEnd();
+						break;
+
+					default:
+						ChangeText(ctrlTextBox.Text);
+						break;
+				}
+			}
+		}
 
 		void EditLabel_AutoSizeChanged(object sender, EventArgs e)
 		{
@@ -156,11 +172,21 @@ namespace EditLabelControl
 			}
 		}
 
-		void BeginEditing(object sender, EventArgs e)
-        {			
-			EditBegin();			         
-        }
+		void ChangeText(string Text)
+        {
+            ctrlLabel.Text = Text;
+			base.Text = Text;
+            EditResizeTextbox();
 
+			// Fire TextChanged event
+			OnChangedText(EventArgs.Empty);
+		}
+
+        void EditResizeTextbox()
+        {
+            ctrlTextBox.Size = ctrlLabel.Size;
+        }
+		
         void EditToggle()
         {
             IsEditing = !IsEditing; // IsEditing boolean
@@ -196,33 +222,7 @@ namespace EditLabelControl
                 else
                     ChangeText(save);
             }
-        }
-
-        public void EndEditing(object sender, EventArgs e)
-        {
-            EditEnd();
-        }
-
-        void OnKeyPress(object sender, KeyEventArgs e)
-        {
-            if (IsEditing)
-            {
-                switch (e.KeyData)
-                {
-                    case Keys.Escape:
-                        EditEnd(false);
-                        break;
-
-                    case Keys.Return:
-                        EditEnd();
-                        break;
-
-                    default:
-                        ChangeText(ctrlTextBox.Text);
-                        break;
-                }
-            }
-        }
+        }       
 
 		#endregion
 
