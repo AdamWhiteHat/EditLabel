@@ -13,7 +13,7 @@ namespace EditLabelControl
 	[DefaultProperty("Text")]
 	public partial class EditLabel : UserControl
     {
-        #region Properties
+#region Properties
         // Public Properties
 
 		[Category("Behavior")]
@@ -34,7 +34,7 @@ namespace EditLabelControl
         public override string Text
         {
             get { return ctrlLabel.Text; }
-            set { ChangeText(value); }
+			set { ChangeText(value); OnTextUpdated(EventArgs.Empty); }
         }
 
 		[Category("Appearance")]
@@ -50,10 +50,10 @@ namespace EditLabelControl
 		// Protected Properties
 		protected string save { get; set; }
 
-		protected bool IsEditing
+		public bool IsEditing
 		{
 			get { return _isEditing; }
-			set { lock (_lockIsEditing) { _isEditing = value; } }
+			protected set { lock (_lockIsEditing) { _isEditing = value; } }
 		}
 		private volatile bool _isEditing = false;
 		private object _lockIsEditing = new object();
@@ -62,18 +62,17 @@ namespace EditLabelControl
 		// Private
 		private Form owner;
 
-        #endregion
+#endregion
 
-        #region Constructors and Initializer
+#region Constructors and Initializer
 
 		public EditLabel()
 			: this(null, "editLabel")
 		{
-			base.BorderStyle = BorderStyle.None;
-			this.IsEditable = true;
 		}
 
-        public EditLabel(Form Owner) : this(Owner, "editLabel")
+        public EditLabel(Form Owner)
+			: this(Owner, "editLabel")
         {
         }
 
@@ -85,8 +84,11 @@ namespace EditLabelControl
 			base.BorderStyle = BorderStyle.None;
 			this.IsEditable = true;
             Initalize_EditAction();
-			this.owner = Owner;
-			owner.Click += EndEditing;
+			if (Owner != null)
+			{
+				this.owner = Owner;
+				owner.Click += EndEditing;
+			}
         }
 
         void Initalize_EditAction()	// TextBox edit events
@@ -102,15 +104,27 @@ namespace EditLabelControl
 			ctrlTextBox.KeyDown += OnKeyPress;
         }
 
-		#endregion
+#endregion
 
-		#region Public Events
+#region Public Events
 
 		[Category("Property Changed")]
 		[Description("Event raised when the value of the Text property is changed on Control.")]
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
 		public new event EventHandler TextChanged;
+
+		[Category("Action")]
+		[Description("Event raised after the text has been updated successfully by user editing or the Text property.")]
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		public event EventHandler TextUpdated;
+
+		[Category("Action")]
+		[Description("Event raised after the user successfully ends an edit event. This event will not fire if the user cancels during editing with the Escape key or if the Text property is set programmatically.")]
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		public event EventHandler EditingSuccessful;
 
 		protected virtual void OnChangedText(EventArgs e)
 		{
@@ -121,9 +135,27 @@ namespace EditLabelControl
 			}
 		}
 
-		#endregion
+		protected virtual void OnTextUpdated(EventArgs e)
+		{
+			EventHandler handler = TextUpdated;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
 
-		#region Internal Event Handlers
+		protected virtual void OnEditingSuccessful(EventArgs e)
+		{
+			EventHandler handler = EditingSuccessful;
+			if (handler != null)
+			{
+				handler(this, e);
+			}
+		}
+
+#endregion
+
+#region Internal Event Handlers
 
 		void BeginEditing(object sender, EventArgs e)
 		{
@@ -217,14 +249,20 @@ namespace EditLabelControl
             {
                 EditToggle();
 
-                if (AcceptChanges)
-                    ChangeText(ctrlTextBox.Text);
-                else
-                    ChangeText(save);
+				if (AcceptChanges)
+				{					
+					ChangeText(ctrlTextBox.Text);
+					OnTextUpdated(EventArgs.Empty);
+					OnEditingSuccessful(EventArgs.Empty);
+				}
+				else
+				{
+					ChangeText(save);
+				}
             }
         }       
 
-		#endregion
+#endregion
 
 	}
 }
