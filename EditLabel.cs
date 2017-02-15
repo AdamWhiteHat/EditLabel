@@ -12,9 +12,9 @@ namespace EditLabelControl
 	[DefaultEvent("TextChanged")]
 	[DefaultProperty("Text")]
 	public partial class EditLabel : UserControl
-    {
-#region Properties
-        // Public Properties
+	{
+		#region Properties
+		// Public Properties
 
 		[Category("Behavior")]
 		[Description("Determines whether the control is allowed to be edited.")]
@@ -27,15 +27,15 @@ namespace EditLabelControl
 		}
 		private bool _isEditable = true;
 
-        [Category("Appearance")]
-        [Description("The text associated with the control.")]
-        [Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public override string Text
-        {
-            get { return ctrlLabel.Text; }
+		[Category("Appearance")]
+		[Description("The text associated with the control.")]
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		public override string Text
+		{
+			get { return ctrlLabel.Text; }
 			set { ChangeText(value); OnTextUpdated(EventArgs.Empty); }
-        }
+		}
 
 		[Category("Appearance")]
 		[Description("Determines the position of the text within the control.")]
@@ -46,7 +46,7 @@ namespace EditLabelControl
 			get { return ctrlLabel.TextAlign; }
 			set { ctrlLabel.TextAlign = value; }
 		}
-		
+
 		// Protected Properties
 		protected string save { get; set; }
 
@@ -57,56 +57,56 @@ namespace EditLabelControl
 		}
 		private volatile bool _isEditing = false;
 		private object _lockIsEditing = new object();
-        
+
 
 		// Private
 		private Form owner;
 
-#endregion
+		#endregion
 
-#region Constructors and Initializer
+		#region Constructors and Initializer
 
 		public EditLabel()
 			: this(null, "editLabel")
 		{
 		}
 
-        public EditLabel(Form Owner)
+		public EditLabel(Form Owner)
 			: this(Owner, "editLabel")
-        {
-        }
+		{
+		}
 
-        public EditLabel(Form Owner, string Text)
-        {
-            InitializeComponent();
-            this.Text = Text;	
+		public EditLabel(Form Owner, string Text)
+		{
+			InitializeComponent();
+			this.Text = Text;
 			this.AutoValidate = AutoValidate.EnableAllowFocusChange;
 			base.BorderStyle = BorderStyle.None;
 			this.IsEditable = true;
-            Initalize_EditAction();
+			Initalize_EditAction();
 			if (Owner != null)
 			{
 				this.owner = Owner;
 				owner.Click += EndEditing;
 			}
-        }
+		}
 
-        void Initalize_EditAction()	// TextBox edit events
-        {
-            ctrlLabel.DoubleClick += BeginEditing;
+		private void Initalize_EditAction() // TextBox edit events
+		{
+			ctrlLabel.DoubleClick += BeginEditing;
 
-            ctrlTextBox.LostFocus += EndEditing;
-            ctrlTextBox.Leave += EndEditing;
+			ctrlTextBox.LostFocus += EndEditing;
+			ctrlTextBox.Leave += EndEditing;
 
-            ctrlTextBox.Click += delegate (object s, EventArgs e) { ((TextBox)s).Focus(); };
-            ctrlLabel.Click += delegate (object s, EventArgs e) { ((Label)s).Focus(); };
+			ctrlTextBox.Click += delegate (object s, EventArgs e) { ((TextBox)s).Focus(); };
+			ctrlLabel.Click += delegate (object s, EventArgs e) { ((Label)s).Focus(); };
 
 			ctrlTextBox.KeyDown += OnKeyPress;
-        }
+		}
 
-#endregion
+		#endregion
 
-#region Public Events
+		#region Public Events
 
 		[Category("Property Changed")]
 		[Description("Event raised when the value of the Text property is changed on Control.")]
@@ -153,21 +153,21 @@ namespace EditLabelControl
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Internal Event Handlers
+		#region Internal Event Handlers
 
-		void BeginEditing(object sender, EventArgs e)
+		private void BeginEditing(object sender, EventArgs e)
 		{
 			EditBegin();
 		}
 
-		public void EndEditing(object sender, EventArgs e)
+		private void EndEditing(object sender, EventArgs e)
 		{
 			EditEnd();
 		}
 
-		void OnKeyPress(object sender, KeyEventArgs e)
+		protected void OnKeyPress(object sender, KeyEventArgs e)
 		{
 			if (IsEditing)
 			{
@@ -188,7 +188,7 @@ namespace EditLabelControl
 			}
 		}
 
-		void EditLabel_AutoSizeChanged(object sender, EventArgs e)
+		private void EditLabel_AutoSizeChanged(object sender, EventArgs e)
 		{
 			if (this.AutoSize == false)
 			{
@@ -204,30 +204,30 @@ namespace EditLabelControl
 			}
 		}
 
-		void ChangeText(string Text)
-        {
-            ctrlLabel.Text = Text;
+		protected void ChangeText(string Text)
+		{
+			ctrlLabel.Text = Text;
 			base.Text = Text;
-            EditResizeTextbox();
+			EditResizeTextbox();
 
 			// Fire TextChanged event
 			OnChangedText(EventArgs.Empty);
 		}
 
-        void EditResizeTextbox()
-        {
-            ctrlTextBox.Size = ctrlLabel.Size;
-        }
-		
-        void EditToggle()
-        {
-            IsEditing = !IsEditing; // IsEditing boolean
-            ctrlLabel.Visible = !ctrlLabel.Visible; // Label visibility
-            ctrlTextBox.Visible = !ctrlTextBox.Visible; // TextBox visibility
-        }
+		private void EditResizeTextbox()
+		{
+			ctrlTextBox.Size = ctrlLabel.Size;
+		}
 
-        void EditBegin()
-        {
+		protected void EditToggle()
+		{
+			IsEditing = !IsEditing; // IsEditing boolean
+			ctrlLabel.Visible = !ctrlLabel.Visible; // Label visibility
+			ctrlTextBox.Visible = !ctrlTextBox.Visible; // TextBox visibility
+		}
+
+		protected void EditBegin()
+		{
 			if (IsEditable)
 			{
 				if (!IsEditing)
@@ -241,16 +241,16 @@ namespace EditLabelControl
 					ctrlTextBox.Focus();
 				}
 			}
-        }
+		}
 
-        void EditEnd(bool AcceptChanges = true)
-        {
-            if (IsEditing)
-            {
-                EditToggle();
+		protected void EditEnd(bool AcceptChanges = true)
+		{
+			if (IsEditing)
+			{
+				EditToggle();
 
 				if (AcceptChanges)
-				{					
+				{
 					ChangeText(ctrlTextBox.Text);
 					OnTextUpdated(EventArgs.Empty);
 					OnEditingSuccessful(EventArgs.Empty);
@@ -259,10 +259,10 @@ namespace EditLabelControl
 				{
 					ChangeText(save);
 				}
-            }
-        }       
+			}
+		}
 
-#endregion
+		#endregion
 
 	}
 }
