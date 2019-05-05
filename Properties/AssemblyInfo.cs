@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("EditLabel Control")]
 [assembly: AssemblyDescription("A Label control who's text can be edited by double clicking on it.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany(@"http://www.csharpprogramming.tips")]
+[assembly: AssemblyCompany(@"https://csharpcodewhisperer.blogspot.com")]
 [assembly: AssemblyProduct("EditLabel Control")]
-[assembly: AssemblyCopyright("Adam Rakaska")]
+[assembly: AssemblyCopyright("Adam White")]
 [assembly: AssemblyTrademark("csharpprogramming.tips")]
 [assembly: AssemblyCulture("")]
 

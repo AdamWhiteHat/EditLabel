@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
- Adam Rakaska 2015 www.csharpprogramming.tips
+Copyright (c) 2015 Adam White https://csharpcodewhisperer.blogspot.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
